@@ -1,0 +1,22 @@
+<launch>
+  <arg name="model" default="burger"/>
+  <arg name="configuration_basename" default=""/>
+  <arg name="open_rviz" default="false"/>
+
+  <group ns="mkn2">
+    <include file="$(find toposim)/launch/includes/cartographer_teb.launch">
+      <arg name="model" value="$(arg model)"/>
+      <arg name="configuration_basename" value="turtlebot3_mkn2.lua"/>
+      <arg name="robot_name" default="mkn2"/>
+  </include>
+  </group>
+
+  <group ns="mkn5">
+    <include file="$(find toposim)/launch/includes/cartographer_teb.launch">
+      <arg name="model" value="$(arg model)"/>
+      <arg name="configuration_basename" value="turtlebot3_mkn5.lua"/>
+      <arg name="robot_name" default="mkn5"/>
+  </include>
+  </group>
+
+</launch>

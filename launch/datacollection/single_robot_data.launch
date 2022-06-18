@@ -1,0 +1,12 @@
+<launch>
+  <arg name="model" default="burger"/>
+  <arg name="configuration_basename" default=""/>
+  <arg name="open_rviz" default="false"/>
+
+    <node name="collect_mkn2_data" pkg="toposim" type="TestDataCollection.py" output="screen">
+        <param name="robot_name" value="mkn2"/>
+    </node>
+
+  <node name="rviz" pkg="rviz" type="rviz" args="-d $(find toposim)/rviz/mkn2.rviz" />
+
+</launch>
