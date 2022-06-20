@@ -1,6 +1,7 @@
 import numpy as np
 import pickle
 
+import pdb
 
 class fakesim:
     def __init__(self, robot_num) -> None:
@@ -8,7 +9,10 @@ class fakesim:
         self.global_step_cnt = 0
         self.data = []
         self.robot_num = robot_num
-        with open("/home/zzl/yxyWorkspace/debug/robot1data.pkl", "rb") as tt:
+        with open("/home/zzl/yxyWorkspace/debug/mkn2data.pkl", "rb") as tt:
+            readdata = pickle.load(tt)
+            self.data.append(readdata)
+        with open("/home/zzl/yxyWorkspace/debug/mkn5data.pkl", "rb") as tt:
             readdata = pickle.load(tt)
             self.data.append(readdata)
     
@@ -20,7 +24,7 @@ class fakesim:
         explored_all = []
         obstacle = []
         map_pose = []
-        for i in range(len(self.robot_num)):
+        for i in range(self.robot_num):
             pos.append(self.data[i]["poses"][0])
             explored.append(self.data[i]["explored_maps"][0])
             explored_all.append(self.data[i]["explored_maps_without_obstacles"][0])
@@ -31,14 +35,17 @@ class fakesim:
 
         return pos, ratio, max_size, explored, explored_all, obstacle, map_pose
     
-    def step(self, global_step):
+    def step(self, global_goal):
         pos = []
         ratio = []
         explored = []
         explored_all = []
         obstacle = []
         map_pose = []
-        for i in range(len(self.robot_num)):
+        if self.step_cnt % 15 == 14:
+            self.global_step_cnt += 1
+        print(self.global_step_cnt)
+        for i in range(self.robot_num):
             pos.append(self.data[i]["poses"][self.step_cnt])
             explored.append(self.data[i]["explored_maps"][self.global_step_cnt])
             explored_all.append(self.data[i]["explored_maps_without_obstacles"][self.global_step_cnt])
@@ -46,15 +53,15 @@ class fakesim:
             map_pose.append(self.data[i]["map_poses"][self.global_step_cnt])
             ratio.append(self.data[i]["ratios"][self.step_cnt])
 
-        self.step_cnt += 1
-        if global_step==0:
-            self.global_step_cnt += 1
-        
+        self.step_cnt += 1        
         return pos, ratio, explored, explored_all, obstacle, map_pose
 
 if __name__ == '__main__':
-
     env = fakesim(1)
-    
 
-    
+    _, _, _,_,_,_,_, = env.reset()
+    np.set_printoptions(threshold=np.inf)
+
+    for i in range(120):
+        pos, ratio, explored, explored_all, obstacle, map_pose = env.step(0)
+        print(explored)
