@@ -32,7 +32,7 @@
 
   <node name="graythreenode" pkg="graythree" type="graythree_node">
     <remap from="cartographerMap" to="cartographer_discrete_map"/>
-    <remap from="map" to="map"/>
+    <remap from="map" to="map_origin"/>
   </node>
 
   <!-- <node pkg="turtlebot3_slam" type="flat_world_imu_node" name="flat_world_imu_node" output="screen">

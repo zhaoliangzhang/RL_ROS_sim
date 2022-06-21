@@ -1,0 +1,14 @@
+<launch>
+  <arg name="model" default="burger"/>
+  <arg name="configuration_basename" default=""/>
+  <arg name="open_rviz" default="false"/>
+
+    <node name="collect_mkn2_runner" pkg="toposim" type="GraphNode.py" output="screen">
+        <param name="robot_name" value="mkn2"/>
+    </node>
+
+  <node name="rviz" pkg="rviz" type="rviz" args="-d $(find toposim)/rviz/mkn2.rviz" />
+
+  <node name="rviz2" pkg="rviz" type="rviz" args="-d $(find toposim)/rviz/mkn5.rviz" />
+
+</launch>

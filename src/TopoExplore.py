@@ -66,29 +66,7 @@ def main(args):
         print("choose to use cpu...")
         device = torch.device("cpu")
         torch.set_num_threads(all_args.n_training_threads)
-
-    # run dir
-    # run_dir = Path(os.path.split(os.path.dirname(os.path.abspath(__file__)))[
-    #                0] + "/results") / all_args.env_name / all_args.algorithm_name / all_args.experiment_name
-    # if not run_dir.exists():
-    #     os.makedirs(str(run_dir))
-
-    # # wandb
-    # if not run_dir.exists():
-    #     curr_run = 'run1'
-    # else:
-    #     exst_run_nums = [int(str(folder.name).split('run')[
-    #                             1]) for folder in run_dir.iterdir() if str(folder.name).startswith('run')]
-    #     if len(exst_run_nums) == 0:
-    #         curr_run = 'run1'
-    #     else:
-    #         curr_run = 'run%i' % (max(exst_run_nums) + 1)
-    #     run_dir = run_dir / curr_run
-    #     if not run_dir.exists():
-    #         os.makedirs(str(run_dir))
-
-    # setproctitle.setproctitle(str(all_args.algorithm_name) + "-" +
-    #                           str(all_args.env_name) + "-" + str(all_args.experiment_name) + "@" + str(all_args.user_name))
+    
     run_dir = './test'
     # seed
     torch.manual_seed(all_args.seed)
@@ -122,7 +100,7 @@ if __name__ == "__main__":
     runner, num_local_steps = main(sys.argv[1:])#init_graph_runner
     fake_sim = fakesim(2)
     pos, _, max_size, _, _, obstacle_map, left_corner = fake_sim.reset()#zzl 
-    max_size = np.array((420,560))
+    max_size = np.array((480,600))
     
     step = 0
     global_goal_position = runner.init_reset(pos, max_size, obstacle_map,left_corner)#init_graph_runner
@@ -139,6 +117,6 @@ if __name__ == "__main__":
             infos = runner.build_graph(pos, update = update)#build_graph
         if step % num_local_steps == num_local_steps-1:
             global_goal_position = runner.get_global_goal(obstacle_map, global_step, infos)#global_goal
-        runner.render(obstacle_map, explored_map, pos, '../test/figures')
+        runner.render(obstacle_map, explored_map, pos, '/home/zzl/yxyWorkspace/src/toposim/test/figures')
         step += 1
     

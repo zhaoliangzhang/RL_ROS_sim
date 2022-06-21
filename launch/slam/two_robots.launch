@@ -19,4 +19,11 @@
   </include>
   </group>
 
+  <node name="map_padding" pkg="toposim" type="map_padding.py" output="screen">
+    <param name="robot_name" value="mkn2"/>
+  </node>
+  <node name="map_padding2" pkg="toposim" type="map_padding.py" output="screen">
+    <param name="robot_name" value="mkn5"/>
+  </node>
+
 </launch>
