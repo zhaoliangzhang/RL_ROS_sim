@@ -3,7 +3,7 @@
   <arg name="configuration_basename" default=""/>
   <arg name="open_rviz" default="false"/>
 
-    <node name="collect_mkn2_runner" pkg="toposim" type="GraphNode.py" output="screen">
+    <node name="collect_mkn2_runner" pkg="toposim" type="runner.py" output="screen">
         <param name="robot_name" value="mkn2"/>
     </node>
 

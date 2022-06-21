@@ -250,7 +250,6 @@ class mantsNode:
         if time_now - self.last_step_time > 0.5:
             pos, ratio, explored_map, explored_map_no_obs, obstacle_map, left_corner = \
             self.poses, self.ratios, self.explored_maps, self.explored_maps_without_obstacles, self.obstacle_maps, self.map_poses 
-            print(left_corner)
             if self.step == 0:
                 global_goal_position = self.runner.init_reset(pos, max_size, obstacle_map,left_corner)#init_graph_runner
             self.global_step = self.step // self.num_local_steps
@@ -263,6 +262,7 @@ class mantsNode:
                 infos = self.runner.build_graph(pos, left_corner, update = update)
             if self.step % self.num_local_steps == 0:
                 global_goal_position = self.runner.get_global_goal(obstacle_map, self.global_step, infos)
+                print(global_goal_position)
                 for i in range(self.robot_num):
                     timenow = rospy.Time(0)
                     try:
