@@ -75,7 +75,7 @@ speedBindings={
 class PublishThread(threading.Thread):
     def __init__(self, rate):
         super(PublishThread, self).__init__()
-        self.publisher = rospy.Publisher('mkn2/cmd_vel', TwistMsg, queue_size = 1)
+        self.publisher = rospy.Publisher('mkn5/cmd_vel', TwistMsg, queue_size = 1)
         self.x = 0.0
         self.y = 0.0
         self.z = 0.0
@@ -188,10 +188,10 @@ def vels(speed, turn):
 if __name__=="__main__":
     settings = saveTerminalSettings()
 
-    rospy.init_node('teleop_twist_keyboard')
+    rospy.init_node('teleop_twist_keyboard2')
 
-    speed = rospy.get_param("~speed", 0.5)
-    turn = rospy.get_param("~turn", 1.0)
+    speed = rospy.get_param("~speed", 0.4)
+    turn = rospy.get_param("~turn", 0.7)
     repeat = rospy.get_param("~repeat_rate", 0.0)
     key_timeout = rospy.get_param("~key_timeout", 0.0)
     stamped = rospy.get_param("~stamped", False)

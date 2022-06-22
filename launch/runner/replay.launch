@@ -1,0 +1,10 @@
+<launch>
+  <arg name="model" default="burger"/>
+  <arg name="configuration_basename" default=""/>
+  <arg name="open_rviz" default="false"/>
+
+  <node name="rviz" pkg="rviz" type="rviz" args="-d $(find toposim)/rviz/mkn2.rviz" />
+
+  <node name="rviz2" pkg="rviz" type="rviz" args="-d $(find toposim)/rviz/mkn5.rviz" />
+
+</launch>

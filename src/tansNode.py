@@ -19,13 +19,13 @@ import torch
 from mants_sim_to_real.envs.Graph_Env import GraphHabitatEnv
 from mants_sim_to_real.utils.config import get_config
 
-from setArgs import graph_runner_init
+from setArgs import tans_runner_init
 
 reference_frame = ["/mkn2/odom", "/mkn5/odom"]
 area = 114800
 max_size = np.array((540,540))
 
-class mantsNode:
+class tansNode:
     def __init__(self, robots_list) -> None:
         self.robot_num = len(robots_list)
         self.robots_list = robots_list
@@ -48,8 +48,9 @@ class mantsNode:
         self.poses = [None for i in range(self.robot_num)]
         self.ratios = [None for i in range(self.robot_num)]
 
-        args = ['--n_rollout_threads', '1', '--ghost_node_size', '12', '--use_all_ghost_add', '--learn_to_build_graph', '--dis_gap', '3.3', '--graph_memory_size', '100', '--build_graph', '--use_merge', '--add_ghost', '--feature_dim', '512', '--hidden_size', '256', '--use_mgnn', '--use_global_goal', '--cut_ghost', '--num_local_steps', '8', '--use_recurrent_policy', '--num_agents', '2', '--model_dir', '/home/zzl/yxyWorkspace/src/mants_sim_to_real/data/model/mants/']
-        self.runner, self.num_local_steps = graph_runner_init(args)#init_graph_runner
+        args = ['--n_rollout_threads', '1', '--hidden_size', '256', '--num_local_steps', '15', '--use_recurrent_policy', '--use_vo', 'ft_use_random', '--num_agents', '2', '--use_single', '--use_goal', '--grid_goal', '--use_grid_simple', '--grid_pos', '--grid_last_goal', '--cnn_use_transformer', '--use_share_cnn_model', '--agent_invariant', '--invariant_type', 'alter_attn', '--use_pos_embedding', '--use_id_embedding', '--multi_layer_cross_attn', '--add_grid_pos', '--use_self_attn', '--use_intra_attn', '--use_maxpool2d', '--cnn_layers_params', '32,3,1,1 64,3,1,1 128,3,1,1 64,3,1,1 32,3,2,1', '--model_dir', '/home/zzl/yxyWorkspace/src/mants_sim_to_real/data/model/tans']
+
+        self.runner, self.num_local_steps = tans_runner_init(args)#init_graph_runner
 
         self.actoinclient = [actionlib.SimpleActionClient(robots_list[i]+'/move_base', MoveBaseAction) for i in range(self.robot_num)]
         self.goal_pub = [rospy.Publisher(robots_list[i]+"/goal", PoseStamped, queue_size=1) for i in range(self.robot_num)]
@@ -129,28 +130,27 @@ class mantsNode:
     
     def run_callback(self, data):
         time_now = rospy.get_time()
-        if time_now - self.last_step_time > 0.4:
+        if time_now - self.last_step_time > 0.5:
             pos, ratio, explored_map, explored_map_no_obs, obstacle_map, left_corner = \
-            self.poses, self.ratios, self.explored_maps, self.explored_maps_without_obstacles, self.obstacle_maps, self.map_poses
+            self.poses, self.ratios, self.explored_maps, self.explored_maps_without_obstacles, self.obstacle_maps, self.map_poses 
             if self.step == 0:
-                global_goal_position = self.runner.init_reset(pos, max_size, obstacle_map,left_corner)#init_graph_runner
+                global_goal_position = self.runner.init_reset(max_size, pos, left_corner, obstacle_map, explored_map)#init_graph_runner
                 self.global_goal = global_goal_position
-                self.new_goal = True
                 self.start_time = rospy.get_time()
+                self.new_goal = True
             self.global_step = self.step // self.num_local_steps
             self.ratios = [0.4, 0.4]
-            
+            self.runner.get_pos(pos)
+
             for i in range(self.robot_num):
                 self.distance_to_goal[i] = (self.global_goal[i][0] - self.poses[i][0])**2 + (self.global_goal[i][1] - self.poses[i][1])**2
                 if self.distance_to_goal[i] <= 400:
                     self.new_goal = True
 
-            if self.new_goal:
-                update = True
-                infos = self.runner.build_graph(pos, left_corner, ratio, explored_map, explored_map_no_obs, obstacle_map, update)
-                global_goal_position = self.runner.get_global_goal(obstacle_map, self.global_step, infos)
-                self.global_goal = global_goal_position
+            if self.step % self.num_local_steps == self.num_local_steps-1:
+                global_goal_position = self.runner.get_global_goal_position(pos, left_corner, obstacle_map, explored_map)
                 print(global_goal_position)
+                self.global_goal = global_goal_position
                 for i in range(self.robot_num):
                     timenow = rospy.Time(0)
                     try:
@@ -187,21 +187,9 @@ class mantsNode:
                         self.goal_pub[i].publish(goal_marker)
                     except:
                         print("goal tf fails")
-                    self.new_goal = False
-            else:
-                update = False
-                infos = self.runner.build_graph(pos, left_corner, update = update)
+                self.new_goal = False
 
-            self.runner.render(obstacle_map, explored_map, pos, '/home/zzl/yxyWorkspace/src/toposim/test/figures/mants')
+            self.runner.render(obstacle_map, explored_map, pos, '/home/zzl/yxyWorkspace/src/toposim/test/figures/tans')
             self.step += 1
             self.last_step_time = rospy.get_time()
             print(self.last_step_time - self.start_time)
-
-if __name__ == "__main__":
-    rospy.init_node('topo_explore_runner')
-    robots_list = ["mkn2", "mkn5"]
-    # robots_list = ["mkn2"]
-
-    node = mantsNode(robots_list)
-
-    rospy.spin()
